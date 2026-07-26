@@ -1,34 +1,40 @@
 using UnityEngine;
 
-public class EntityState
+public abstract class EntityState
 {
 
 
+    protected Player player;
     protected StateMachine stateMachine;
-    protected string stateName;
+    protected string animBoolName;
+
+    protected Animator anim;
 
 
 
-    public EntityState(StateMachine stateMachine, string stateName)
+    public EntityState(Player player, StateMachine stateMachine, string animBoolName)
     {
+        this.player = player;
         this.stateMachine = stateMachine;
-        this.stateName = stateName;
+        this.animBoolName = animBoolName;
+
+        anim = player.anim;
     }
 
 
     public virtual void Enter()
     {
-        Debug.Log("I enter " +  stateName);
+        anim.SetBool(animBoolName, true);
     }
 
     public virtual void Update()
     {
-        Debug.Log("I run update of " + stateName);
+        Debug.Log("I run update of " + animBoolName);
     }
 
     public virtual void Exit()
     {
-        Debug.Log("I exit " + stateName);
+        anim.SetBool(animBoolName, false);
     }
 
 

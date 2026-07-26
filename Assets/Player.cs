@@ -3,15 +3,45 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
 
+
+    public Animator anim { get; private set; }
+
+
+
+    private PlayerInputSet input;
     private StateMachine stateMachine;
 
-    private EntityState idleState;
+    public Player_IdleState idleState { get; private set; }
+    public Player_MoveState moveState { get; private set; }
+
+    public Vector2 moveInput { get; private set; }
 
     private void Awake()
     {
-        stateMachine = new StateMachine();
 
-        idleState = new EntityState(stateMachine, "Idle State");
+        anim = GetComponentInChildren<Animator>();
+
+
+        stateMachine = new StateMachine();
+        input = new PlayerInputSet();
+
+        idleState = new Player_IdleState(this, stateMachine, "idle");
+        moveState = new Player_MoveState(this, stateMachine, "move");
+    }
+
+    private void OnEnable()
+    {
+        input.Enable();
+
+        input.Player.Movement.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
+        input.Player.Movement.canceled += ctx => moveInput = Vector2.zero;
+    }
+
+    private void OnDisable()
+    {
+        input.Player.Movement.performed -= ctx => moveInput = ctx.ReadValue<Vector2>();
+        input.Player.Movement.canceled -= ctx => moveInput = Vector2.zero;
+        input.Disable();
     }
 
 
@@ -23,7 +53,7 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        stateMachine.currentState.Update();
+        stateMachine.UpdateActiveState();
     }
 
 }
